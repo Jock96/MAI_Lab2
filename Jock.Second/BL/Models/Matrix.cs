@@ -37,5 +37,29 @@
                   {  0,  0,  0, }, 
                   { -1, -2, -1, }, };
         }
+
+        /// <summary>
+        /// Горизонтальная матрица Робертса.
+        /// </summary>
+        public static double[,] Roberts2x2Horizontal
+        {
+            get => new double[,]
+            {
+                { 1,  0 },
+                { 0, -1 }
+            };
+        }
+
+        /// <summary>
+        /// Вертикальная матрица Робертса.
+        /// </summary>
+        public static double[,] Roberts2x2Vertical
+        {
+            get => new double[,]
+            {
+                {  0, 1 },
+                { -1, 0 }
+            };
+        }
     }
 }

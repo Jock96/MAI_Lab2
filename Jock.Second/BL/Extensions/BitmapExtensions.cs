@@ -33,7 +33,7 @@
         /// <param name="grayscale">Использование ч/б фильтра.</param>
         /// <returns>Возвращает изображение с выделенными границами.</returns>
         public static Bitmap ConvertByLaplasianFilter(this Bitmap sourceBitmap,
-                                                    bool grayscale = true)
+            bool grayscale = true)
         {
             var factor = 1;
             var bias = 0;
@@ -52,9 +52,9 @@
 
             if (grayscale == true)
             {
-                float rgb = 0;
+                var rgb = 0f;
 
-                for (int k = 0; k < pixelBuffer.Length; k += 4)
+                for (var k = 0; k < pixelBuffer.Length; k += 4)
                 {
                     rgb = pixelBuffer[k] * 0.11f;
                     rgb += pixelBuffer[k + 1] * 0.59f;
@@ -78,7 +78,7 @@
             var filterOffset = (filterWidth - 1) / 2;
             var calcOffset = 0;
 
-            int byteOffset = 0;
+            var byteOffset = 0;
 
             for (var offsetY = filterOffset; offsetY <
                 sourceBitmap.Height - filterOffset; offsetY++)
@@ -145,17 +145,144 @@
                 }
             }
 
-            var resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
+            return sourceBitmap.GetResultBitmapFromBuffer(resultBuffer);
+        }
 
-            var resultData = resultBitmap.LockBits(new Rectangle(0, 0,
-                                     resultBitmap.Width, resultBitmap.Height),
-                                                      ImageLockMode.WriteOnly,
-                                                 System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        /// <summary>
+        /// Выделение границ методом Робертса.
+        /// </summary>
+        /// <param name="sourceBitmap">Изображение.</param>
+        /// <param name="grayscale">Использование ч/б фильтра.</param>
+        /// <returns>Возвращает изображение с выделенными границами.</returns>
+        public static Bitmap ConvertByRobertsFilter(this Bitmap sourceBitmap,
+            bool grayscale = true)
+        {
+            var xFilterMatrix = Models.Matrix.Roberts2x2Horizontal;
+            var yFilterMatrix = Models.Matrix.Roberts2x2Vertical;
 
-            Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
-            resultBitmap.UnlockBits(resultData);
+            var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0,
+                                     sourceBitmap.Width, sourceBitmap.Height),
+                                                       ImageLockMode.ReadOnly,
+                                                  System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            return resultBitmap;
+            var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+            var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
+
+            Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
+            sourceBitmap.UnlockBits(sourceData);
+
+            if (grayscale == true)
+            {
+                float rgb = 0;
+
+                for (var k = 0; k < pixelBuffer.Length; k += 4)
+                {
+                    rgb = pixelBuffer[k] * 0.11f;
+                    rgb += pixelBuffer[k + 1] * 0.59f;
+                    rgb += pixelBuffer[k + 2] * 0.3f;
+
+                    pixelBuffer[k] = (byte)rgb;
+                    pixelBuffer[k + 1] = pixelBuffer[k];
+                    pixelBuffer[k + 2] = pixelBuffer[k];
+                    pixelBuffer[k + 3] = 255;
+                }
+            }
+
+            var blueX = 0d;
+            var greenX = 0d;
+            var redX = 0d;
+
+            var blueY = 0d;
+            var greenY = 0d;
+            var redY = 0d;
+
+            var blueTotal = 0d;
+            var greenTotal = 0d;
+            var redTotal = 0d;
+
+            var filterOffset = 1;
+            var calcOffset = 0;
+
+            var byteOffset = 0;
+
+            for (var offsetY = filterOffset; offsetY <
+                sourceBitmap.Height - filterOffset; offsetY++)
+            {
+                for (var offsetX = filterOffset; offsetX <
+                    sourceBitmap.Width - filterOffset; offsetX++)
+                {
+                    blueX = greenX = redX = 0;
+                    blueY = greenY = redY = 0;
+
+                    blueTotal = greenTotal = redTotal = 0.0;
+
+                    byteOffset = offsetY *
+                                 sourceData.Stride +
+                                 offsetX * 4;
+
+                    for (var filterY = -filterOffset;
+                        filterY <= filterOffset - 1; filterY++)
+                    {
+                        for (var filterX = -filterOffset;
+                            filterX <= filterOffset - 1; filterX++)
+                        {
+                            calcOffset = byteOffset +
+                                         (filterX * 4) +
+                                         (filterY * sourceData.Stride);
+
+                            blueX += (pixelBuffer[calcOffset]) *
+                                      xFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+
+                            greenX += (pixelBuffer[calcOffset + 1]) *
+                                      xFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+
+                            redX += (pixelBuffer[calcOffset + 2]) *
+                                      xFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+
+                            blueY += (pixelBuffer[calcOffset]) *
+                                      yFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+
+                            greenY += (pixelBuffer[calcOffset + 1]) *
+                                      yFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+
+                            redY += (pixelBuffer[calcOffset + 2]) *
+                                      yFilterMatrix[filterY + filterOffset,
+                                              filterX + filterOffset];
+                        }
+                    }
+
+                    blueTotal = Math.Sqrt((blueX * blueX) + (blueY * blueY));
+                    greenTotal = Math.Sqrt((greenX * greenX) + (greenY * greenY));
+                    redTotal = Math.Sqrt((redX * redX) + (redY * redY));
+
+                    if (blueTotal > 255)
+                        blueTotal = 255;
+                    else if (blueTotal < 0)
+                        blueTotal = 0;
+
+                    if (greenTotal > 255)
+                        greenTotal = 255;
+                    else if (greenTotal < 0)
+                        greenTotal = 0;
+
+                    if (redTotal > 255)
+                        redTotal = 255;
+                    else if (redTotal < 0)
+                        redTotal = 0;
+
+                    resultBuffer[byteOffset] = (byte)(blueTotal);
+                    resultBuffer[byteOffset + 1] = (byte)(greenTotal);
+                    resultBuffer[byteOffset + 2] = (byte)(redTotal);
+                    resultBuffer[byteOffset + 3] = 255;
+                }
+            }
+
+            return sourceBitmap.GetResultBitmapFromBuffer(resultBuffer);
         }
 
         /// <summary>
@@ -165,7 +292,7 @@
         /// <param name="grayscale">Использование ч/б фильтра.</param>
         /// <returns>Возвращает изображение с выделенными границами.</returns>
         public static Bitmap ConvertBySobelFilter(this Bitmap sourceBitmap,
-                                                bool grayscale = true)
+            bool grayscale = true)
         {
             var xFilterMatrix = Models.Matrix.Sobel3x3Horizontal;
             var yFilterMatrix = Models.Matrix.Sobel3x3Vertical;
@@ -292,6 +419,15 @@
                 }
             }
 
+            return sourceBitmap.GetResultBitmapFromBuffer(resultBuffer);
+        }
+
+        /// <summary>
+        /// Получить подготовленное изображение из буфера.
+        /// </summary>
+        private static Bitmap GetResultBitmapFromBuffer(this Bitmap sourceBitmap,
+            byte[] resultBuffer)
+        {
             var resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
 
             var resultData = resultBitmap.LockBits(new Rectangle(0, 0,
@@ -301,7 +437,6 @@
 
             Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
             resultBitmap.UnlockBits(resultData);
-
             return resultBitmap;
         }
     }

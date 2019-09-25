@@ -37,7 +37,7 @@
                 result = bitmap.ConvertBySobelFilter(isUseGrayScale);
 
             if (parameter.IsRoberts)
-                MessageBox.Show("Операция не реализована");
+                result = bitmap.ConvertByRobertsFilter(isUseGrayScale);
 
             if (result == null)
                 return;
