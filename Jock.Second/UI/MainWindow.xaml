@@ -28,5 +28,21 @@
                 HorizontalContentAlignment="Center"/>
         <Image Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="3"
                Panel.ZIndex="-1" Source="{Binding ImageSource}"/>
+        <Grid Grid.Row="1" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <RadioButton Grid.Row="0" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Left" Content="Метод Собеля"
+                         IsChecked="{Binding IsSobel}"/>
+            <RadioButton Grid.Row="1" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Left" Content="Метод Робертса"
+                         IsChecked="{Binding IsRoberts}"/>
+            <RadioButton Grid.Row="2" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Left" Content="Метод Лапласа"
+                         IsChecked="{Binding IsLaplass}"/>
+        </Grid>
     </Grid>
 </Window>
