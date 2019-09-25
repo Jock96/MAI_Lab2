@@ -46,6 +46,7 @@
     <Compile Include="Constants\PathConstants.cs" />
     <Compile Include="Extensions\BitmapExtensions.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
+    <Compile Include="Models\Matrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

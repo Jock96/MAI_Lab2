@@ -19,6 +19,24 @@
             GetEdgesCommand = new GetEdgesCommand();
         }
 
+        /// <summary>
+        /// Использовать выделение в cерых тонах.
+        /// </summary>
+        private bool _isUseGrayScale;
+
+        /// <summary>
+        /// Использовать выделение в cерых тонах.
+        /// </summary>
+        public bool IsUseGrayScale
+        {
+            get => _isUseGrayScale;
+            set
+            {
+                _isUseGrayScale = value;
+                OnPropertyChanged();
+            }
+        }
+
         #region Выборы методов
 
         /// <summary>

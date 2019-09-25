@@ -44,5 +44,8 @@
                          HorizontalContentAlignment="Left" Content="Метод Лапласа"
                          IsChecked="{Binding IsLaplass}"/>
         </Grid>
+        <RadioButton Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"
+                     VerticalContentAlignment="Center" HorizontalContentAlignment="Left"
+                     Content="В серых тонах" IsChecked="{Binding IsUseGrayScale}"/>
     </Grid>
 </Window>
