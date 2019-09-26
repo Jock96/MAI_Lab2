@@ -40,6 +40,38 @@
         #region Выборы методов
 
         /// <summary>
+        /// Выбор метода Канни.
+        /// </summary>
+        private bool _isCannyMethod;
+
+        /// <summary>
+        /// Выбор метода Канни.
+        /// </summary>
+        public bool IsCannyMethod
+        {
+            get => _isCannyMethod;
+            set
+            {
+                _isCannyMethod = value;
+
+                if (value == true)
+                {
+                    _isLaplass = false;
+                    _isRoberts = false;
+                    _isSobel = false;
+                    _isUseGrayScale = false;
+
+                    OnPropertyChanged(nameof(IsLaplass));
+                    OnPropertyChanged(nameof(IsRoberts));
+                    OnPropertyChanged(nameof(IsSobel));
+                    OnPropertyChanged(nameof(IsUseGrayScale));
+                }
+
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Выбор метода Лапласса.
         /// </summary>
         private bool _isLaplass;
@@ -61,6 +93,9 @@
 
                     _isSobel = false;
                     OnPropertyChanged(nameof(IsSobel));
+
+                    _isCannyMethod = false;
+                    OnPropertyChanged(nameof(IsCannyMethod));
                 }
 
                 OnPropertyChanged();
@@ -89,6 +124,9 @@
 
                     _isSobel = false;
                     OnPropertyChanged(nameof(IsSobel));
+
+                    _isCannyMethod = false;
+                    OnPropertyChanged(nameof(IsCannyMethod));
                 }
 
                 OnPropertyChanged();
@@ -117,6 +155,9 @@
 
                     _isRoberts = false;
                     OnPropertyChanged(nameof(IsRoberts));
+
+                    _isCannyMethod = false;
+                    OnPropertyChanged(nameof(IsCannyMethod));
                 }
 
                 OnPropertyChanged();

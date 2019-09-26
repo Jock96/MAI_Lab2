@@ -7,6 +7,7 @@
     using System.Windows.Media.Imaging;
     using System.Drawing.Imaging;
     using System.Runtime.InteropServices;
+    using Bl.Utils;
 
     /// <summary>
     /// Класс расширений для <see cref="Bitmap"/>.
@@ -420,6 +421,19 @@
             }
 
             return sourceBitmap.GetResultBitmapFromBuffer(resultBuffer);
+        }
+
+        /// <summary>
+        /// Выделить границы методом Канни.
+        /// </summary>
+        /// <param name="sourceBitmap">Изображение.</param>
+        /// <param name="grayscale">Использование ч/б фильтра.</param>
+        /// <returns>Возвращает изображение с выделенными границами.</returns>
+        public static Bitmap ConvertByCannyMethod(this Bitmap sourceBitmap,
+            bool grayscale = true)
+        {
+            var CannyData = new CannyUtil(sourceBitmap);
+            return CannyData.GetImageWithEdges(CannyData.EdgeMap);
         }
 
         /// <summary>

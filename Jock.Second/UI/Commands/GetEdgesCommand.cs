@@ -39,13 +39,15 @@
             if (parameter.IsRoberts)
                 result = bitmap.ConvertByRobertsFilter(isUseGrayScale);
 
+            if (parameter.IsCannyMethod)
+                result = bitmap.ConvertByCannyMethod();
+
             if (result == null)
                 return;
 
             try
             {
                 parameter.ImageSource = result.ConvertToImageSource();
-                //parameter.CurrentBitmap = result;
             }
             catch (Exception exception)
             {
